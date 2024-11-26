@@ -25,6 +25,8 @@ namespace segundo_parcial.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TasaCambiaria>>> GetTasaCambiarias()
         {
+            await CreateCounter();
+
             return await _context.TasaCambiarias.ToListAsync();
         }
 
@@ -32,6 +34,8 @@ namespace segundo_parcial.Controllers
         [HttpGet("{moneda}")]
         public async Task<ActionResult<TasaCambiaria>> GetTasaCambiaria(string moneda)
         {
+            await CreateCounter();
+
             var tasaCambiaria = await _context.TasaCambiarias
                 .Where(x => x.CodigoMoneda.ToLower() == moneda.ToLower())
                 .FirstOrDefaultAsync();
@@ -44,6 +48,8 @@ namespace segundo_parcial.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutTasaCambiaria(int id, TasaCambiaria tasaCambiaria)
         {
+            await CreateCounter();
+
             if (id != tasaCambiaria.Id)
             {
                 return BadRequest();
@@ -75,6 +81,8 @@ namespace segundo_parcial.Controllers
         [HttpPost]
         public async Task<ActionResult<TasaCambiaria>> PostTasaCambiaria(TasaCambiaria tasaCambiaria)
         {
+            await CreateCounter();
+
             _context.TasaCambiarias.Add(tasaCambiaria);
             await _context.SaveChangesAsync();
 
@@ -85,6 +93,8 @@ namespace segundo_parcial.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTasaCambiaria(int id)
         {
+            await CreateCounter();
+
             var tasaCambiaria = await _context.TasaCambiarias.FindAsync(id);
             if (tasaCambiaria == null)
             {
@@ -100,6 +110,22 @@ namespace segundo_parcial.Controllers
         private bool TasaCambiariaExists(int id)
         {
             return _context.TasaCambiarias.Any(e => e.Id == id);
+        }
+
+        private async Task CreateCounter()
+        {
+            var counter = await _context.Counters.Where(x => x.Service == "Tasa Cambiaria").FirstOrDefaultAsync();
+
+            if (counter is null)
+            {
+                await _context.Counters.AddAsync(new Counter { Service = "Tasa Cambiaria", Count = 1 });
+            }
+            else
+            {
+                counter.Count += 1;
+            }
+
+            await _context.SaveChangesAsync();
         }
     }
 }

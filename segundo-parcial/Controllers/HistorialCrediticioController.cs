@@ -25,6 +25,8 @@ namespace segundo_parcial.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<HistorialCrediticio>>> GetHistorialCrediticios()
         {
+            await CreateCounter();
+
             return await _context.HistorialCrediticios.ToListAsync();
         }
 
@@ -32,6 +34,8 @@ namespace segundo_parcial.Controllers
         [HttpGet("{search}")]
         public async Task<ActionResult<HistorialCrediticio>> GetHistorialCrediticio(string search)
         {
+            await CreateCounter();
+
             var historialCrediticio = await _context.HistorialCrediticios
                 .Where(x => x.Cedula.Contains(search) || x.Rnc.Contains(search))
                 .FirstOrDefaultAsync();
@@ -49,6 +53,8 @@ namespace segundo_parcial.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutHistorialCrediticio(int id, HistorialCrediticio historialCrediticio)
         {
+            await CreateCounter();
+
             if (id != historialCrediticio.Id)
             {
                 return BadRequest();
@@ -80,6 +86,8 @@ namespace segundo_parcial.Controllers
         [HttpPost]
         public async Task<ActionResult<HistorialCrediticio>> PostHistorialCrediticio(HistorialCrediticio historialCrediticio)
         {
+            await CreateCounter();
+
             _context.HistorialCrediticios.Add(historialCrediticio);
             await _context.SaveChangesAsync();
 
@@ -90,6 +98,8 @@ namespace segundo_parcial.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteHistorialCrediticio(int id)
         {
+            await CreateCounter();
+
             var historialCrediticio = await _context.HistorialCrediticios.FindAsync(id);
             if (historialCrediticio == null)
             {
@@ -105,6 +115,22 @@ namespace segundo_parcial.Controllers
         private bool HistorialCrediticioExists(int id)
         {
             return _context.HistorialCrediticios.Any(e => e.Id == id);
+        }
+
+        private async Task CreateCounter()
+        {
+            var counter = await _context.Counters.Where(x => x.Service == "Historial Crediticio").FirstOrDefaultAsync();
+
+            if (counter is null)
+            {
+                await _context.Counters.AddAsync(new Counter { Service = "Historial Crediticio", Count = 1 });
+            }
+            else
+            {
+                counter.Count += 1;
+            }
+
+            await _context.SaveChangesAsync();
         }
     }
 }

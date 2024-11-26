@@ -25,6 +25,8 @@ namespace segundo_parcial.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<SaludFinanciera>>> GetSaludFinancieras()
         {
+            await CreateCounter();
+
             return await _context.SaludFinancieras.ToListAsync();
         }
 
@@ -32,6 +34,8 @@ namespace segundo_parcial.Controllers
         [HttpGet("{search}")]
         public async Task<ActionResult<SaludFinanciera>> GetSaludFinanciera(string search)
         {
+            await CreateCounter();
+
             var saludFinanciera = await _context.SaludFinancieras
                 .Where(x => x.Cedula.Contains(search) || x.Rnc.Contains(search))
                 .FirstOrDefaultAsync();
@@ -49,6 +53,8 @@ namespace segundo_parcial.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutSaludFinanciera(int id, SaludFinanciera saludFinanciera)
         {
+            await CreateCounter();
+
             if (id != saludFinanciera.Id)
             {
                 return BadRequest();
@@ -80,6 +86,8 @@ namespace segundo_parcial.Controllers
         [HttpPost]
         public async Task<ActionResult<SaludFinanciera>> PostSaludFinanciera(SaludFinanciera saludFinanciera)
         {
+            await CreateCounter();
+
             _context.SaludFinancieras.Add(saludFinanciera);
             await _context.SaveChangesAsync();
 
@@ -90,6 +98,8 @@ namespace segundo_parcial.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteSaludFinanciera(int id)
         {
+            await CreateCounter();
+
             var saludFinanciera = await _context.SaludFinancieras.FindAsync(id);
             if (saludFinanciera == null)
             {
@@ -105,6 +115,22 @@ namespace segundo_parcial.Controllers
         private bool SaludFinancieraExists(int id)
         {
             return _context.SaludFinancieras.Any(e => e.Id == id);
+        }
+
+        private async Task CreateCounter()
+        {
+            var counter = await _context.Counters.Where(x => x.Service == "Salud Financiera").FirstOrDefaultAsync();
+
+            if (counter is null)
+            {
+                await _context.Counters.AddAsync(new Counter { Service = "Salud Financiera", Count = 1 });
+            }
+            else
+            {
+                counter.Count += 1;
+            }
+
+            await _context.SaveChangesAsync();
         }
     }
 }

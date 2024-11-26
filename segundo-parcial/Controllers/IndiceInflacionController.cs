@@ -25,6 +25,8 @@ namespace segundo_parcial.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<IndiceInflacion>>> GetIndiceInflaciones()
         {
+            await CreateCounter();
+
             return await _context.IndiceInflaciones.ToListAsync();
         }
 
@@ -32,6 +34,8 @@ namespace segundo_parcial.Controllers
         [HttpGet("{fecha}")]
         public async Task<ActionResult<IndiceInflacion>> GetIndiceInflacion(DateTime fecha)
         {
+            await CreateCounter();
+
             var indiceInflacion = await _context.IndiceInflaciones
                 .Where(x => x.Periodo.Year == fecha.Year && x.Periodo.Month == fecha.Month)
                 .FirstOrDefaultAsync();
@@ -44,6 +48,8 @@ namespace segundo_parcial.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutIndiceInflacion(int id, IndiceInflacion indiceInflacion)
         {
+            await CreateCounter();
+
             if (id != indiceInflacion.Id)
             {
                 return BadRequest();
@@ -75,6 +81,8 @@ namespace segundo_parcial.Controllers
         [HttpPost]
         public async Task<ActionResult<IndiceInflacion>> PostIndiceInflacion(IndiceInflacion indiceInflacion)
         {
+            await CreateCounter();
+
             _context.IndiceInflaciones.Add(indiceInflacion);
             await _context.SaveChangesAsync();
 
@@ -85,6 +93,8 @@ namespace segundo_parcial.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteIndiceInflacion(int id)
         {
+            await CreateCounter();
+
             var indiceInflacion = await _context.IndiceInflaciones.FindAsync(id);
             if (indiceInflacion == null)
             {
@@ -100,6 +110,22 @@ namespace segundo_parcial.Controllers
         private bool IndiceInflacionExists(int id)
         {
             return _context.IndiceInflaciones.Any(e => e.Id == id);
+        }
+
+        private async Task CreateCounter()
+        {
+            var counter = await _context.Counters.Where(x => x.Service == "Indice Inflacion").FirstOrDefaultAsync();
+
+            if (counter is null)
+            {
+                await _context.Counters.AddAsync(new Counter { Service = "Indice Inflacion", Count = 1 });
+            }
+            else
+            {
+                counter.Count += 1;
+            }
+
+            await _context.SaveChangesAsync();
         }
     }
 }

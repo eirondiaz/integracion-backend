@@ -12,6 +12,7 @@ namespace segundo_parcial.Context
         public DbSet<IndiceInflacion> IndiceInflaciones { get; set; }
         public DbSet<SaludFinanciera> SaludFinancieras { get; set; }
         public DbSet<HistorialCrediticio> HistorialCrediticios { get; set; }
+        public DbSet<Counter> Counters { get; set; }
     }
 }
 
